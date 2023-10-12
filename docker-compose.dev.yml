@@ -1,0 +1,22 @@
+services:
+  adminer:
+    image: adminer:4
+    environment:
+      ADMINER_DESIGN: pepa-linha
+      ADMINER_DEFAULT_SERVER: database
+    ports:
+      - '127.0.0.1:8080:8080'
+
+  database:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: 'cafeverywhere'
+      POSTGRES_USER: 'dev'
+      POSTGRES_PASSWORD: 'HaloPassword138'
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - dev-db:/var/lib/postgresql/data
+
+volumes:
+  dev-db:
