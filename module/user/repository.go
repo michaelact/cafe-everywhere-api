@@ -3,6 +3,9 @@ package user
 import (
 	"database/sql"
 	"context"
+	"errors"
+
+	"github.com/michaelact/cafe-everywhere/helper"
 )
 
 type UserRepository interface {
@@ -21,22 +24,17 @@ func NewUserRepository() UserRepository {
 
 func (self *UserRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, user UserDatabaseIO) UserDatabaseIO {
 	// Insert new user
-	SQLPut := "INSERT INTO Users(email, password) VALUES(email, password)"
-	result, err := tx.ExecContext(ctx, SQLPut, user.Email, user.Password)
-	helper.PanicIfError(err)
+	SQLPut := "INSERT INTO users(email, password) VALUES ($1,$2) RETURNING id;"
+	tx.QueryRowContext(ctx, SQLPut, user.Email, user.Password).Scan(&user.Id)
 
 	// Return created user
-	id, err := result.LastInsertId()
-	helper.PanicIfError(err)
-	user, err = self.FindById(ctx, tx, int(id))
-	helper.PanicIfError(err)
 	return user
 }
 
 func (self *UserRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, user UserDatabaseIO) UserDatabaseIO {
 	// Update existing user
-	SQLPut := "UPDATE Users SET email=?, password=? WHERE id=?"
-	_, err := tx.ExecContext(ctx, SQLPut, user.Title, user.Email, user.Id)
+	SQLPut := "UPDATE users SET email=$1, password=$2 WHERE id=$3;"
+	_, err := tx.ExecContext(ctx, SQLPut, user.Email, user.Password, user.Id)
 	helper.PanicIfError(err)
 
 	// Return updated user
@@ -47,14 +45,14 @@ func (self *UserRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, user Use
 
 func (self *UserRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id int) {
 	// Delete existing user
-	SQLDel := "UPDATE Users SET deleted_at=NOW(), is_active=TRUE WHERE id=?"
+	SQLDel := "UPDATE users SET deleted_at=NOW(), is_active=TRUE WHERE id=$1;"
 	_, err := tx.ExecContext(ctx, SQLDel, id)
 	helper.PanicIfError(err)
 }
 
-func (self *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int) UserDatabaseIO {
+func (self *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int) (UserDatabaseIO, error) {
 	// Extract existing user
-	SQLGet := "SELECT email, password, created_at, updated_at, deleted_at, is_active FROM Users WHERE id=?"
+	SQLGet := "SELECT email, password, created_at, updated_at, deleted_at, is_active FROM users WHERE id=$1;"
 	rows, err := tx.QueryContext(ctx, SQLGet, id)
 	helper.PanicIfError(err)
 
@@ -73,7 +71,7 @@ func (self *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int
 
 func (self *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, page int) []UserDatabaseIO {
 	// Extract all user
-	SQLGet := "SELECT email, password, created_at, updated_at, deleted_at, is_active FROM Users"
+	SQLGet := "SELECT email, password, created_at, updated_at, deleted_at, is_active FROM users"
 	rows, err := tx.QueryContext(ctx, SQLGet)
 	helper.PanicIfError(err)
 

@@ -2,7 +2,6 @@ package user
 
 import (
 	"database/sql"
-	"context"
 	"time"
 )
 

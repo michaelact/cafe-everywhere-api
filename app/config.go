@@ -1,5 +1,20 @@
 package app
 
+import (
+    "log"
+
+    "github.com/joeshaw/envdecode"
+)
+
+func NewConfig() *ConfigApplication {
+    var c ConfigApplication
+    if err := envdecode.StrictDecode(&c); err != nil {
+        log.Fatalf("Failed to decode: %s", err)
+    }
+
+    return &c
+}
+
 type ConfigApplication struct {
     API      API
     Database Database

@@ -9,7 +9,7 @@ import (
 )
 
 func NewDB(c *ConfigApplication) *sql.DB {
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 						c.Database.User,
 						c.Database.Password,
 						c.Database.Host,
