@@ -13,7 +13,8 @@ type UserRepository interface {
 	Update(ctx context.Context, tx *sql.Tx, user UserDatabaseIO) UserDatabaseIO
 	Delete(ctx context.Context, tx *sql.Tx, id int)
 	FindById(ctx context.Context, tx *sql.Tx, id int) (UserDatabaseIO, error)
-	FindAll(ctx context.Context, tx *sql.Tx, page int) []UserDatabaseIO
+	FindByEmail(ctx context.Context, tx *sql.Tx, email string) (UserDatabaseIO, error)
+	FindAll(ctx context.Context, tx *sql.Tx) []UserDatabaseIO
 }
 
 type UserRepositoryImpl struct {}
@@ -33,7 +34,7 @@ func (self *UserRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, user Use
 
 func (self *UserRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, user UserDatabaseIO) UserDatabaseIO {
 	// Update existing user
-	SQLPut := "UPDATE users SET email=$1, password=$2 WHERE id=$3;"
+	SQLPut := "UPDATE users SET email=$1, password=$2 WHERE id=$3 AND is_active=true;"
 	_, err := tx.ExecContext(ctx, SQLPut, user.Email, user.Password, user.Id)
 	helper.PanicIfError(err)
 
@@ -50,9 +51,27 @@ func (self *UserRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id int) 
 	helper.PanicIfError(err)
 }
 
+func (self *UserRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (UserDatabaseIO, error) {
+	// Extract existing user
+	SQLGet := "SELECT id, email, password, created_at, updated_at FROM users WHERE email=$1 AND is_active=true;"
+	rows, err := tx.QueryContext(ctx, SQLGet, email)
+	helper.PanicIfError(err)
+
+	// Bind all columns value to user variable
+	user := UserDatabaseIO{}
+	defer rows.Close()
+	if rows.Next() {
+		err := rows.Scan(&user.Id, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt)
+		helper.PanicIfError(err)
+		return user, nil
+	} else {
+		return user, errors.New("User not found")
+	}
+}
+
 func (self *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int) (UserDatabaseIO, error) {
 	// Extract existing user
-	SQLGet := "SELECT email, password, created_at, updated_at, deleted_at, is_active FROM users WHERE id=$1;"
+	SQLGet := "SELECT email, password, created_at, updated_at FROM users WHERE id=$1 AND is_active=true;"
 	rows, err := tx.QueryContext(ctx, SQLGet, id)
 	helper.PanicIfError(err)
 
@@ -61,7 +80,7 @@ func (self *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int
 	user.Id = id
 	defer rows.Close()
 	if rows.Next() {
-		err := rows.Scan(&user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt, &user.IsActive)
+		err := rows.Scan(&user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 		helper.PanicIfError(err)
 		return user, nil
 	} else {
@@ -69,9 +88,9 @@ func (self *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int
 	}
 }
 
-func (self *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, page int) []UserDatabaseIO {
+func (self *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []UserDatabaseIO {
 	// Extract all user
-	SQLGet := "SELECT email, password, created_at, updated_at, deleted_at, is_active FROM users"
+	SQLGet := "SELECT id, email, password, created_at, updated_at, is_active FROM users WHERE is_active=true"
 	rows, err := tx.QueryContext(ctx, SQLGet)
 	helper.PanicIfError(err)
 
@@ -80,7 +99,7 @@ func (self *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, page in
 	defer rows.Close()
 	for rows.Next() {
 		user := UserDatabaseIO{}
-		err := rows.Scan(&user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt, &user.IsActive)
+		err := rows.Scan(&user.Id, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt, &user.IsActive)
 		helper.PanicIfError(err)
 
 		listUser = append(listUser, user)
