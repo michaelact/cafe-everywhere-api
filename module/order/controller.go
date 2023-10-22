@@ -13,6 +13,7 @@ type OrderController interface {
 	Update(res http.ResponseWriter, req *http.Request, params httprouter.Params)
 	Delete(res http.ResponseWriter, req *http.Request, params httprouter.Params)
 	FindById(res http.ResponseWriter, req *http.Request, params httprouter.Params)
+	FindByCafeId(res http.ResponseWriter, req *http.Request, params httprouter.Params)
 	FindByUserId(res http.ResponseWriter, req *http.Request, params httprouter.Params)
 	FindAll(res http.ResponseWriter, req *http.Request, params httprouter.Params)
 }
@@ -68,6 +69,20 @@ func (self *OrderControllerImpl) Delete(res http.ResponseWriter, req *http.Reque
 	webResponse := helper.WebResponse{
 		Status:  "Success", 
 		Message: "Success", 
+	}
+
+	helper.WriteToResponseBody(res, &webResponse)
+}
+
+func (self *OrderControllerImpl) FindByCafeId(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+	requestId, err := strconv.Atoi(params.ByName("cafeId"))
+	helper.PanicIfError(err)
+
+	serviceResponse := self.OrderService.FindByCafeId(req.Context(), requestId)
+	webResponse := helper.WebResponse{
+		Status:  "Success", 
+		Message: "Success", 
+		Data:    serviceResponse, 
 	}
 
 	helper.WriteToResponseBody(res, &webResponse)

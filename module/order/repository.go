@@ -13,6 +13,7 @@ type OrderRepository interface {
 	Update(ctx context.Context, tx *sql.Tx, order OrderDatabaseIO) OrderDatabaseIO
 	Delete(ctx context.Context, tx *sql.Tx, id int)
 	FindById(ctx context.Context, tx *sql.Tx, id int) (OrderDatabaseIO, error)
+	FindByCafeId(ctx context.Context, tx *sql.Tx, cafeId int) []OrderDatabaseIO
 	FindByUserId(ctx context.Context, tx *sql.Tx, userId int) []OrderDatabaseIO
 	FindAll(ctx context.Context, tx *sql.Tx) []OrderDatabaseIO
 }
@@ -57,6 +58,26 @@ func (self *OrderRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id int)
 	SQLRefundAvailableCount := "UPDATE menu SET count = count + ( SELECT SUM(count) FROM \"order\" WHERE id = $1 ) WHERE id = ( SELECT menu_id FROM \"order\" WHERE id = $1 );"
 	_, err = tx.ExecContext(ctx, SQLRefundAvailableCount, id)
 	helper.PanicIfError(err)
+}
+
+func (self *OrderRepositoryImpl) FindByCafeId(ctx context.Context, tx *sql.Tx, cafeId int) []OrderDatabaseIO {
+	// Extract existing order
+	SQLGet := "SELECT o.id, o.menu_id, o.user_id, o.notes, o.count, o.status, o.address, o.created_at, o.updated_at FROM \"order\" o JOIN menu m ON o.menu_id = m.id WHERE m.cafe_id=$1 AND o.is_active=true;"
+	rows, err := tx.QueryContext(ctx, SQLGet, cafeId)
+	helper.PanicIfError(err)
+
+	// Iterate all extracted rows
+	var listOrder []OrderDatabaseIO
+	defer rows.Close()
+	for rows.Next() {
+		order := OrderDatabaseIO{}
+		err := rows.Scan(&order.Id, &order.MenuId, &order.UserId, &order.Notes, &order.Count, &order.Status, &order.Address, &order.CreatedAt, &order.UpdatedAt)
+		helper.PanicIfError(err)
+
+		listOrder = append(listOrder, order)
+	}
+
+	return listOrder
 }
 
 func (self *OrderRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.Tx, userId int) []OrderDatabaseIO {

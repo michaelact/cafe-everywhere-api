@@ -29,6 +29,7 @@ func NewRouter(userController user.UserController, cafeController cafe.CafeContr
 	router.PATCH("/cafe/:cafeId", cafeController.Update)
 	router.DELETE("/cafe/:cafeId", cafeController.Delete)
 	router.GET("/cafe-menu/:cafeId", menuController.FindByCafeId)
+	router.GET("/cafe-order/:cafeId", orderController.FindByCafeId)
 
 	router.GET("/menu", menuController.FindAll)
 	router.POST("/menu", menuController.Create)

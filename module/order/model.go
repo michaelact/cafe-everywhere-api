@@ -23,7 +23,7 @@ type HTTPOrderRequest struct {
 	MenuId  int    `validate:"required" json:"menu_id"`
 	UserId  int    `validate:"required" json:"user_id"`
 	Count   int    `validate:"required" json:"count"`
-	Address string `json:"address"`
+	Address string `validate:"required" json:"address"`
 	Notes   string `json:"notes"`
 }
 

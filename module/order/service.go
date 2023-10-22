@@ -15,6 +15,7 @@ type OrderService interface {
 	Update(ctx context.Context, request HTTPOrderUpdateRequest) HTTPOrderResponse
 	Delete(ctx context.Context, id int)
 	FindById(ctx context.Context, id int) HTTPOrderResponse
+	FindByCafeId(ctx context.Context, cafeId int) []HTTPOrderResponse
 	FindByUserId(ctx context.Context, userId int) []HTTPOrderResponse
 	FindAll(ctx context.Context) []HTTPOrderResponse
 }
@@ -88,6 +89,15 @@ func (self *OrderServiceImpl) Delete(ctx context.Context, id int) {
 
 	// Delete existing order
 	self.OrderRepository.Delete(ctx, tx, id)
+}
+
+func (self *OrderServiceImpl) FindByCafeId(ctx context.Context, userId int) []HTTPOrderResponse {
+	tx, err := self.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	listOrder := self.OrderRepository.FindByCafeId(ctx, tx, userId)
+	return ToOrderResponses(listOrder)
 }
 
 func (self *OrderServiceImpl) FindByUserId(ctx context.Context, userId int) []HTTPOrderResponse {
