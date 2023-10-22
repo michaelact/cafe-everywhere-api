@@ -71,7 +71,7 @@ func (self *CafeRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, ema
 
 func (self *CafeRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int) (CafeDatabaseIO, error) {
 	// Extract existing cafe
-	SQLGet := "SELECT email, title, password, created_at, updated_at FROM cafe WHERE id=$1 AND is_active=true;"
+	SQLGet := "SELECT email, title, password, created_at, updated_at FROM cafe WHERE id=$1 AND is_active=true LIMIT 1;"
 	rows, err := tx.QueryContext(ctx, SQLGet, id)
 	helper.PanicIfError(err)
 

@@ -4,6 +4,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"net/http"
 
+	"github.com/michaelact/cafe-everywhere/module/menu"
 	"github.com/michaelact/cafe-everywhere/module/cafe"
 	"github.com/michaelact/cafe-everywhere/module/user"
 	"github.com/michaelact/cafe-everywhere/middleware"
@@ -25,7 +26,11 @@ func InitializeServer() *http.Server {
 	cafeService := cafe.NewCafeService(cafeRepository, db, validate)
 	cafeController := cafe.NewCafeController(cafeService)
 
-	router := app.NewRouter(userController, cafeController)
+	menuRepository := menu.NewMenuRepository()
+	menuService := menu.NewMenuService(menuRepository, db, validate)
+	menuController := menu.NewMenuController(menuService)
+
+	router := app.NewRouter(userController, cafeController, menuController)
 	authMiddleware := middleware.NewAuthMiddleware(router, conf)
 
 	server := app.NewServer(authMiddleware, conf)

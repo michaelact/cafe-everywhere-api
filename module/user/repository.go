@@ -71,7 +71,7 @@ func (self *UserRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, ema
 
 func (self *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int) (UserDatabaseIO, error) {
 	// Extract existing user
-	SQLGet := "SELECT email, password, created_at, updated_at FROM users WHERE id=$1 AND is_active=true;"
+	SQLGet := "SELECT email, password, created_at, updated_at FROM users WHERE id=$1 AND is_active=true LIMIT 1;"
 	rows, err := tx.QueryContext(ctx, SQLGet, id)
 	helper.PanicIfError(err)
 
