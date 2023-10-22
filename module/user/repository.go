@@ -46,7 +46,7 @@ func (self *UserRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, user Use
 
 func (self *UserRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id int) {
 	// Delete existing user
-	SQLDel := "UPDATE users SET deleted_at=NOW(), is_active=TRUE WHERE id=$1;"
+	SQLDel := "UPDATE users SET deleted_at=NOW(), is_active=false WHERE id=$1;"
 	_, err := tx.ExecContext(ctx, SQLDel, id)
 	helper.PanicIfError(err)
 }
@@ -90,7 +90,7 @@ func (self *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int
 
 func (self *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []UserDatabaseIO {
 	// Extract all user
-	SQLGet := "SELECT id, email, password, created_at, updated_at, is_active FROM users WHERE is_active=true"
+	SQLGet := "SELECT id, email, password, created_at, updated_at FROM users WHERE is_active=true"
 	rows, err := tx.QueryContext(ctx, SQLGet)
 	helper.PanicIfError(err)
 
@@ -99,7 +99,7 @@ func (self *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []UserD
 	defer rows.Close()
 	for rows.Next() {
 		user := UserDatabaseIO{}
-		err := rows.Scan(&user.Id, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt, &user.IsActive)
+		err := rows.Scan(&user.Id, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 		helper.PanicIfError(err)
 
 		listUser = append(listUser, user)

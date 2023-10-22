@@ -3,13 +3,14 @@ package app
 import (
 	"github.com/julienschmidt/httprouter"
 
+	"github.com/michaelact/cafe-everywhere/module/order"
 	"github.com/michaelact/cafe-everywhere/module/menu"
 	"github.com/michaelact/cafe-everywhere/module/cafe"
 	"github.com/michaelact/cafe-everywhere/module/user"
 	"github.com/michaelact/cafe-everywhere/exception"
 )
 
-func NewRouter(userController user.UserController, cafeController cafe.CafeController, menuController menu.MenuController) *httprouter.Router {
+func NewRouter(userController user.UserController, cafeController cafe.CafeController, menuController menu.MenuController, orderController order.OrderController) *httprouter.Router {
 	router := httprouter.New()
 	router.PanicHandler = exception.ErrorHandler
 
@@ -19,6 +20,7 @@ func NewRouter(userController user.UserController, cafeController cafe.CafeContr
 	router.GET("/users/:userId", userController.FindById)
 	router.PATCH("/users/:userId", userController.Update)
 	router.DELETE("/users/:userId", userController.Delete)
+	router.GET("/users-order/:userId", orderController.FindByUserId)
 
 	router.POST("/cafe/login", cafeController.Login)
 	router.GET("/cafe", cafeController.FindAll)
@@ -33,6 +35,12 @@ func NewRouter(userController user.UserController, cafeController cafe.CafeContr
 	router.GET("/menu/:menuId", menuController.FindById)
 	router.PATCH("/menu/:menuId", menuController.Update)
 	router.DELETE("/menu/:menuId", menuController.Delete)
+
+	router.GET("/order", orderController.FindAll)
+	router.POST("/order", orderController.Create)
+	router.GET("/order/:orderId", orderController.FindById)
+	router.PATCH("/order/:orderId", orderController.Update)
+	router.DELETE("/order/:orderId", orderController.Delete)
 
 	return router
 }

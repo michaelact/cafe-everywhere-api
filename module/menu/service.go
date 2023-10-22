@@ -99,7 +99,6 @@ func (self *MenuServiceImpl) FindByCafeId(ctx context.Context, cafeId int) []HTT
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	// Fail if existing menu not found
 	listMenu := self.MenuRepository.FindByCafeId(ctx, tx, cafeId)
 	return ToMenuResponses(listMenu)
 }

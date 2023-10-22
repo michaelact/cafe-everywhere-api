@@ -46,22 +46,23 @@ func (self *CafeRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, cafe Caf
 
 func (self *CafeRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id int) {
 	// Delete existing cafe
-	SQLDel := "UPDATE cafe SET deleted_at=NOW(), is_active=TRUE WHERE id=$1;"
+	SQLDel := "UPDATE cafe SET deleted_at=NOW(), is_active=false WHERE id=$1;"
 	_, err := tx.ExecContext(ctx, SQLDel, id)
 	helper.PanicIfError(err)
 }
 
 func (self *CafeRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (CafeDatabaseIO, error) {
 	// Extract existing cafe
-	SQLGet := "SELECT id, email, title, password, created_at, updated_at FROM cafe WHERE email=$1 AND is_active=true;"
+	SQLGet := "SELECT id, title, password, created_at, updated_at FROM cafe WHERE email=$1 AND is_active=true;"
 	rows, err := tx.QueryContext(ctx, SQLGet, email)
 	helper.PanicIfError(err)
 
 	// Bind all columns value to cafe variable
 	cafe := CafeDatabaseIO{}
+	cafe.Email = email
 	defer rows.Close()
 	if rows.Next() {
-		err := rows.Scan(&cafe.Id, &cafe.Email, &cafe.Title, &cafe.Password, &cafe.CreatedAt, &cafe.UpdatedAt)
+		err := rows.Scan(&cafe.Id, &cafe.Title, &cafe.Password, &cafe.CreatedAt, &cafe.UpdatedAt)
 		helper.PanicIfError(err)
 		return cafe, nil
 	} else {
@@ -90,7 +91,7 @@ func (self *CafeRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int
 
 func (self *CafeRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []CafeDatabaseIO {
 	// Extract all cafe
-	SQLGet := "SELECT id, email, title, password, created_at, updated_at, is_active FROM cafe WHERE is_active=true"
+	SQLGet := "SELECT id, email, title, password, created_at, updated_at FROM cafe WHERE is_active=true"
 	rows, err := tx.QueryContext(ctx, SQLGet)
 	helper.PanicIfError(err)
 
@@ -99,7 +100,7 @@ func (self *CafeRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []CafeD
 	defer rows.Close()
 	for rows.Next() {
 		cafe := CafeDatabaseIO{}
-		err := rows.Scan(&cafe.Id, &cafe.Email, &cafe.Title, &cafe.Password, &cafe.CreatedAt, &cafe.UpdatedAt, &cafe.IsActive)
+		err := rows.Scan(&cafe.Id, &cafe.Email, &cafe.Title, &cafe.Password, &cafe.CreatedAt, &cafe.UpdatedAt)
 		helper.PanicIfError(err)
 
 		listCafe = append(listCafe, cafe)

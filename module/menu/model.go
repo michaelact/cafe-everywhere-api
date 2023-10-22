@@ -20,7 +20,7 @@ type MenuDatabaseIO struct {
 
 type HTTPMenuRequest struct {
 	Title       string `validate:"required" json:"title"`	
-	CafeId      int    `validate:"required" json:"cafeId"`
+	CafeId      int    `validate:"required" json:"cafe_id"`
 	Count       int    `validate:"required" json:"count"`
 	Price       int    `validate:"required" json:"price"`
 	Description string `json:"description"`
@@ -41,7 +41,7 @@ type HTTPMenuResponse struct {
 	Description string    `json:"description"`
 	Count       int       `json:"count"`
 	Price       int       `json:"price"`
-	CafeId      int       `json:"cafeId"`
+	CafeId      int       `json:"cafe_id"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }

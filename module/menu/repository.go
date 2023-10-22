@@ -46,14 +46,14 @@ func (self *MenuRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, menu Men
 
 func (self *MenuRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id int) {
 	// Delete existing menu
-	SQLDel := "UPDATE menu SET deleted_at=NOW(), is_active=FALSE WHERE id=$1;"
+	SQLDel := "UPDATE menu SET deleted_at=NOW(), is_active=false WHERE id=$1;"
 	_, err := tx.ExecContext(ctx, SQLDel, id)
 	helper.PanicIfError(err)
 }
 
 func (self *MenuRepositoryImpl) FindByCafeId(ctx context.Context, tx *sql.Tx, cafeId int) []MenuDatabaseIO {
 	// Extract existing menu
-	SQLGet := "SELECT id, cafe_id, title, description, count, price, created_at, updated_at FROM menu WHERE cafe_id=$1 AND is_active=true;"
+	SQLGet := "SELECT id, title, description, count, price, created_at, updated_at FROM menu WHERE cafe_id=$1 AND is_active=true;"
 	rows, err := tx.QueryContext(ctx, SQLGet, cafeId)
 	helper.PanicIfError(err)
 
@@ -62,7 +62,8 @@ func (self *MenuRepositoryImpl) FindByCafeId(ctx context.Context, tx *sql.Tx, ca
 	defer rows.Close()
 	for rows.Next() {
 		menu := MenuDatabaseIO{}
-		err := rows.Scan(&menu.Id, &menu.CafeId, &menu.Title, &menu.Description, &menu.Count, &menu.Price, &menu.CreatedAt, &menu.UpdatedAt)
+		menu.CafeId = cafeId
+		err := rows.Scan(&menu.Id, &menu.Title, &menu.Description, &menu.Count, &menu.Price, &menu.CreatedAt, &menu.UpdatedAt)
 		helper.PanicIfError(err)
 
 		listMenu = append(listMenu, menu)
@@ -92,7 +93,7 @@ func (self *MenuRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int
 
 func (self *MenuRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []MenuDatabaseIO {
 	// Extract all menu
-	SQLGet := "SELECT id, cafe_id, title, description, count, price, created_at, updated_at, is_active FROM menu WHERE is_active=true"
+	SQLGet := "SELECT id, cafe_id, title, description, count, price, created_at, updated_at FROM menu WHERE is_active=true"
 	rows, err := tx.QueryContext(ctx, SQLGet)
 	helper.PanicIfError(err)
 
@@ -101,7 +102,7 @@ func (self *MenuRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []MenuD
 	defer rows.Close()
 	for rows.Next() {
 		menu := MenuDatabaseIO{}
-		err := rows.Scan(&menu.Id, &menu.CafeId, &menu.Title, &menu.Description, &menu.Count, &menu.Price, &menu.CreatedAt, &menu.UpdatedAt, &menu.IsActive)
+		err := rows.Scan(&menu.Id, &menu.CafeId, &menu.Title, &menu.Description, &menu.Count, &menu.Price, &menu.CreatedAt, &menu.UpdatedAt)
 		helper.PanicIfError(err)
 
 		listMenu = append(listMenu, menu)
