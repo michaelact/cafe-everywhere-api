@@ -34,7 +34,7 @@ func (self *UserRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, user Use
 
 func (self *UserRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, user UserDatabaseIO) UserDatabaseIO {
 	// Update existing user
-	SQLPut := "UPDATE users SET email=$1, password=$2 WHERE id=$3 AND is_active=true;"
+	SQLPut := "UPDATE users SET email=$1, password=$2, updated_at=NOW() WHERE id=$3 AND is_active=true;"
 	_, err := tx.ExecContext(ctx, SQLPut, user.Email, user.Password, user.Id)
 	helper.PanicIfError(err)
 

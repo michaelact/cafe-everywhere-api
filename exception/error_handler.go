@@ -2,6 +2,7 @@ package exception
 
 import (
 	"net/http"
+	"log"
 
 	"github.com/go-playground/validator/v10"
 
@@ -13,7 +14,8 @@ func ErrorHandler(res http.ResponseWriter, req *http.Request, err interface{}) {
 	if validationError(res, req, err) { return }
 
 	// If error doesn't match the error above
-	message := "Something went wrong.!"
+	log.Println(err)
+	message := "Something went wrong!"
 	helper.WriteToResponseBodyError(res, http.StatusInternalServerError, message)
 }
 
