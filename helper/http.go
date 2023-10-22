@@ -8,7 +8,7 @@ import (
 type WebResponse struct {
 	Status  string      `json:"status"`
 	Message string      `json:"message"`
-	Data    interface{}
+	Data    interface{} `json:"data"`
 }
 
 func ReadFromRequestBody(req *http.Request, result interface{}) {

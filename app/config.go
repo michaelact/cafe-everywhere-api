@@ -23,7 +23,8 @@ type ConfigApplication struct {
 }
 
 type API struct {
-    Key string `env:"API_KEY,required"`
+    Key    string `env:"API_KEY,required"`
+    Origin string `env:"ORIGIN,required"`
 }
 
 type Server struct {

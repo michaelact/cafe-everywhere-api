@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"context"
 	"errors"
+	"log"
 
 	"github.com/michaelact/cafe-everywhere/helper"
 )
@@ -27,6 +28,7 @@ func (self *UserRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, user Use
 	// Insert new user
 	SQLPut := "INSERT INTO users(email, password) VALUES ($1,$2) RETURNING id;"
 	tx.QueryRowContext(ctx, SQLPut, user.Email, user.Password).Scan(&user.Id)
+	log.Println(user.Email, user.Password)
 
 	// Return created user
 	return user

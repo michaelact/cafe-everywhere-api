@@ -39,14 +39,11 @@ func (self *UserControllerImpl) Login(res http.ResponseWriter, req *http.Request
 			Message: "User Sign-in Success.", 
 			Data:    serviceResponse,
 		}
-	} else {
-		webResponse = helper.WebResponse{
-			Status:  "Failed", 
-			Message: "User Sign-in Failure.", 
-		}
-	}
 
-	helper.WriteToResponseBody(res, &webResponse)
+		helper.WriteToResponseBody(res, &webResponse)
+	} else {
+		helper.WriteToResponseBodyError(res, http.StatusUnauthorized, "User Sign-in Failure.")
+	}
 }
 
 func (self *UserControllerImpl) Create(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
