@@ -14,7 +14,7 @@ Follow these simple steps to get Cafe Everywhere up and running on your local en
 
 Make sure you have the following installed on your system:
 
-- [Golang v1.20.4](https://go.dev/dl/go1.20.4.linux-amd64.tar.gz)
+- [Golang v1.20.4](https://go.dev/dl/go1.20.4.linux-amd64.tar.gz) or latest version
 - [Rancher Desktop](https://rancherdesktop.io/) or [Docker](https://docs.docker.com/engine/install/)
 
 ### Setup
@@ -31,7 +31,7 @@ Make sure you have the following installed on your system:
    ```
 
 3. **Perform Database Migration:**
-   - Access [Adminer](http://localhost:8080/)
+   - Access [Adminer](http://localhost:8090/)
    - Connect to PostgreSQL with the following details:
      - **System:** PostgreSQL
      - **Database:** database
@@ -58,6 +58,8 @@ Make sure you have the following installed on your system:
 Access Cafe Everywhere API at `http://localhost:9999`.
 
 ## Build Cafe Everywhere
+
+### To Binary
 
 If you want to build Cafe Everywhere into a single binary file, follow these steps:
 
@@ -91,6 +93,17 @@ If you want to build Cafe Everywhere into a single binary file, follow these ste
    ```
 
 Now you can run Cafe Everywhere from anywhere in your terminal by simply typing `cafe-everywhere`.
+
+### To Docker
+
+If you want to build Cafe Everywhere into a container image, follow these steps:
+
+2. **Run Container:**
+   ```shell
+   docker compose up -d
+   ```
+
+Now you can run Cafe Everywhere from your computer browser by simply typing http://localhost:9000.
 
 ## License
 
