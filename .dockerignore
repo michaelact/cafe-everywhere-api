@@ -1,3 +1,7 @@
 database/
 .env.example
 .gitignore
+.env
+.git
+Dockerfile
+docker-compose*
